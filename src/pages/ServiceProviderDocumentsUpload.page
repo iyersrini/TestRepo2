@@ -1,0 +1,551 @@
+<!-- 
+@name: Service Provider document upload page
+@author:Revathy Chithamalai
+@date: Jan 11, 2017.
+@description: This is the page used to upload service provider documents.
+@ Modified by :  Amritha - ARC8599  
+@ Modified Date : Jan 19,2017
+@ Modified Reason : To redesign the page as per wireframe and apply global styles
+-->
+<apex:page showHeader="false"   controller="ServiceProviderDocUpload_Extension">
+    <html>
+        <!--form tags for using command buttons-->
+        <apex:form id="theForm" enctype="multipart/form-data">
+            <head>
+                <title>Service Provider Onboarding</title>
+                <meta name="viewport" content="width=device-width"/>
+                <!-- Global CSS styles applies-->
+                <apex:stylesheet value="{!URLFOR($Resource.serviceProvider)}"/>
+                <!-- START:Custom Style -->
+                <style>    
+                    .label:focus {  
+color:#00AE4D;  
+
+    }
+                    .error-input-field:focus ~ .label   { 
+                        color:black;
+                    }
+                   
+                    .slclc{
+                        Height: 55px !important;
+                    }
+                    .dispute-select{
+                        width:90%;
+                        Height: 55px !important;
+                    }
+                    textarea{
+                        Height: inherit !important;
+                    }
+                     @media (max-width: 720px) { 
+                        .btn-row .elem-right{
+                             margin-top: 10px;
+                            float: left;
+                        }
+                    }
+                    body{
+                        background-color: #ffffff
+                    }
+                    .inputfield_Extr{
+                        padding:5px !important;
+                    }
+                </style>
+                <!-- ENDS: Custom Style --->
+                <apex:includeScript value="{!$Resource.jquery_1_9_1}"/>
+                <script type="text/javascript">
+            
+                    var j$ = jQuery.noConflict();       
+                    j$(document).ready(function(){
+                        j$(".numeric").keypress(function (e) {
+                        //if the letter is not digit then display error and don't type anything
+                            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {            
+                                return false;
+                            }
+                        });
+                    
+                    
+                
+                    });
+                 
+               
+                 
+                document.onload = exit();
+                function exit(){
+                if('{!closeWindow}'=='true')
+                { 
+                  
+                 parent.location.reload()
+                 
+                 }       
+                }
+            
+                  function isDate(inpDate) { 
+                    var objDate,  // date object initialized from the ExpiryDate string 
+                        mSeconds, // ExpiryDate in milliseconds 
+                        day,      // day 
+                        month,    // month 
+                        year;     // year 
+                    // date length should be 10 characters (no more no less) 
+                    if (ExpiryDate.length !== 10) { 
+                        return false; 
+                    } 
+                    // third and sixth character should be '/' 
+                    if (ExpiryDate.substring(2, 3) !== '/' || ExpiryDate.substring(5, 6) !== '/') { 
+                        return false; 
+                    } 
+                    // extract month, day and year from the ExpiryDate (expected format is mm/dd/yyyy) 
+                    // subtraction will cast variables to integer implicitly (needed 
+                    // for !== comparing) 
+                    month = ExpiryDate.substring(0, 2) - 1; // because months in JS start from 0 
+                    day = ExpiryDate.substring(3, 5) - 0; 
+                    year = ExpiryDate.substring(6, 10) - 0; 
+                    // test year range 
+                    if (year < 1000 || year > 3000) { 
+                        return false; 
+                    } 
+                    // convert ExpiryDate to milliseconds 
+                    mSeconds = (new Date(year, month, day)).getTime(); 
+                    // initialize Date() object from calculated milliseconds 
+                    objDate = new Date(); 
+                    objDate.setTime(mSeconds); 
+                    // compare input date and parts from Date() object 
+                    // if difference exists then date isn't valid 
+                    if (objDate.getFullYear() !== year || 
+                        objDate.getMonth() !== month || 
+                        objDate.getDate() !== day) { 
+                        return false; 
+                    } 
+                    // otherwise return true 
+                    return true; 
+                }
+
+             
+         
+                function onSaveClosePopup(){
+                    
+                    var eleval = j$("input[id$=isEnableToParent]").val();
+                    if(eleval == 'false'){
+                        parent.location.reload();
+                    }
+                }
+                function tt(chkboxCtrl) {
+                    var ele = document.getElementById('tteee');
+                    try {
+                        // hide if checked
+                        if( chkboxCtrl.checked ) {
+                            j$("[id$=InsExpirationDate]").val("12/31/4000");
+                            j$("[id$=InsExpirationDate]").prop("disabled",true);
+                            j$("[id$=InsExpirationDate1]").val("12/31/4000");
+                            j$("[id$=InsExpirationDate1]").prop("disabled",true);
+                            ele.style.display='none';
+                        }
+                        else {
+                            j$("[id$=InsExpirationDate]").val("");
+                            j$("[id$=InsExpirationDate]").prop("disabled",false);
+                            j$("[id$=InsExpirationDate1]").prop("disabled",false);
+                            ele.style.display='';
+                        }
+                    }
+                    catch(e) {
+                        alert(e);
+                    }
+                }
+                function onRefrash() { 
+                    var flag = '{!WorkersCompensationInsurance}';
+                    if(flag == 'false')return;
+                    var elecheckbox = document.getElementById('j_id0:theForm:WorkersCompWaiver');
+                    var ele = document.getElementById('tteee');
+
+                    if( elecheckbox.checked ) {         
+                        ele.style.display='none';
+                    }
+                    else {
+                        ele.style.display='';
+                    }
+                }
+         
+
+                </script>
+            </head>
+            <body>
+    
+            <apex:outputPanel layout="block" style="{!if(DocType == 'Dispute License','background-color: #ffffff', 'background-color: #f3f5f5')}"> 
+            <div class="container">
+                 <apex:outputPanel rendered="{!DocType != 'Dispute License'}" >
+                    <div class="header-content" id="header-content">
+                       <div id="logo" class="logo">
+                          <apex:image value="{!$Resource.Home_Depot_Logo}" width="200px" height="90px;" id="headerImage" />
+                       </div>
+                    </div>
+                </apex:outputPanel>
+                <div id="mainFormDiv"> 
+                    <h1>{!pageHeader}</h1>
+                    <apex:pageMessages id="pageMsg"/>
+                    <div class="row">
+                          <!--- Service provider Agreement doc meta data -->
+                        <apex:outputPanel rendered="{!DocType=='Service Provider Agreement'}" >
+                            <apex:outputPanel rendered="{!LEN(spaSignedDateError)==0}">
+                               <div class="label">Service Provider Agreement Signed Date<span class="req">*</span> </div> 
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.SPA_Signed_Date__c}" id="SPAsignedDate" />
+                            </apex:outputPanel>
+                            
+                            <apex:outputPanel rendered="{!LEN(spaSignedDateError)!=0}">
+                                <div class="label error-msg">Service Provider Agreement Signed Date<span class="req">*</span></div> 
+                                    <apex:inputField styleClass="error-input-field" id="SPAsignedDate1" value="{!myProviderDoc.SPA_Signed_Date__c}"   />
+                                <div class="errorMsg error-msg"><strong></strong>&nbsp;{!spaSignedDateError}</div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="row">
+                           <!--- Business doc meta data -->
+                        <apex:outputPanel rendered="{!DocType=='Business Documents'}" >
+                            <div class="label">Business Document Type </div>
+                            <b><apex:outputText value="{!ProviderDoc.Document_Type__c}" /></b>                             
+                        </apex:outputPanel>
+                    </div>
+                     <!--- Insurance doc meta data -->
+                    <apex:outputPanel rendered="{!DocType=='Insurance'}">
+                     <div class="row">  
+                            <apex:outputPanel rendered="{!LEN(InsEffectiveDateError)==0}">
+                               <div class="label">Insurance Effective Date<span class="req">*</span> </div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c}" id="InsEffectiveDate" />
+                            </apex:outputPanel>
+                            
+                            <apex:outputPanel rendered="{!LEN(InsEffectiveDateError)!=0}">
+                                <div class="label">Insurance Effective Date<span class="req">*</span> </div> 
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c}" id="InsEffectiveDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InsEffectiveDateError}</div>
+                            </apex:outputPanel>
+                        </div>
+                        <apex:outputPanel rendered="{!WorkersCompensationInsurance}">
+                            <div class="row">                            
+                                <apex:inputCheckbox value="{!ProviderDoc.Workers_Compensation_Waiver__c}" id="WorkersCompWaiver" onchange="tt(this);" style="margin-right:10px;float:left;"/>
+                                <div class="label"> Workers Compensation waiver </div> 
+                            </div>
+                        </apex:outputPanel> 
+                        <div class="row" id="tteee">  
+                            <apex:outputPanel rendered="{!LEN(InsExpirationDateError)==0}">
+                               <div class="label">Insurance Expiration Date<span class="req">*</span></div> 
+                               <apex:inputField styleClass="input-field"  value="{!myProviderDoc.Expiration_Date__c}" id="InsExpirationDate" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(InsExpirationDateError)!=0}">
+                                <div class="label">Insurance Expiration Date<span class="req">*</span></div> 
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Expiration_Date__c}" id="InsExpirationDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InsExpirationDateError}</div>
+                            </apex:outputPanel>
+                        </div>
+                        <apex:outputPanel rendered="{!IF(myProviderDoc.Document_Type__c == 'Workers Compensation Exemption' || myProviderDoc.Document_Type__c == 'Workers Compensation Waiver',true,false)}">
+                                                              <div class="row" id="insauth">  
+                                <apex:outputPanel rendered="{!LEN(InsIssuingAuthorityError)==0}">
+                                   <div class="label">Issuing Authority State<span class="req">*</span></div> 
+                                   <apex:inputField styleClass="input-field inputfield_Extr"   value="{!myProviderDoc.Licensing_Authority_State__c}" id="InsIssuingAuthority" />
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!LEN(InsIssuingAuthorityError)!=0}">
+                                   <div class="label">Issuing Authority State<span class="req">*</span></div> 
+                                   <apex:inputField styleClass="input-field inputfield_Extr" value="{!myProviderDoc.Licensing_Authority_State__c}" id="InsIssuingAuthority2" />
+                                   <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InsIssuingAuthorityError}</div>
+                                </apex:outputPanel>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!IF(myProviderDoc.Document_Type__c != 'Workers Compensation Waiver',true,false)}">
+                             <div class="row">                        
+                                <div class="label"> Policy Number </div> 
+                                <apex:inputText styleClass="input-field" value="{!ProviderDoc.Policy_Number__c}" id="InsPolicyNo" />
+                                <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InsPolicyNumberError}</div>
+                            </div>
+                            <div class="row">  
+                                <div class="label"> Insured Name </div>
+                                <apex:inputText styleClass="input-field" value="{!ProviderDoc.Insured_Company_Name__c}" id="InsCompName" />
+                                <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InsCompanyNameError}</div>
+                            </div>
+                            <apex:outputPanel rendered="{!IF(myProviderDoc.Document_Type__c != 'Workers Compensation Exemption',true,false)}">
+                                
+                                <div class="row">  
+                                    <div class="label"> Limits </div>
+                                    <apex:inputField styleClass="input-field slclc" value="{!ProviderDoc.Limits__c}" id="InsLimits" />
+                                </div>
+
+                                 <div class="row">
+                                    <div class="label"> Description (if any)</div><div style="height:1px;">&nbsp;</div>
+                                    <apex:inputTextArea styleClass="input-field" value="{!ProviderDoc.Description__c}" id="Description" rows="3"/>
+                                 </div>
+                                 <script>
+                                 onRefrash();                           
+                                 </script>
+                             </apex:outputPanel>
+                        </apex:outputPanel>
+                     </apex:outputPanel> 
+                     <!-- Insurance ends here -->
+                    <!-- Start: Story -->
+                    <!--- Environmental License doc meta data -->
+                     <apex:outputPanel rendered="{!DocType=='Environmental License'}">
+                         <div class="row">                        
+                            <div class="label"> License Name </div>
+                            <b><apex:outputText value="{!ProviderDoc.License_Name__c}" id="EnvLicLicenseName" /></b>
+                        </div>
+                        <div class="row">
+                             <div class="label"> License State </div> 
+                            <b><apex:outputText value="{!ProviderDoc.Licensing_Authority_State__c}" id="EnvLicensingAuthorityState" /></b>
+                        </div>
+                        <div class="row">
+                            <div class="label"> License Holder Type </div>
+                            <b><apex:outputText value="{!ProviderDoc.License_Holder_Type__c}" id="EnvLicLicenseHolderType" /></b>
+                        </div>
+						<div class="row">
+                            <apex:outputPanel rendered="{!LEN(EPALicEffectiveDateError)==0}">
+                               <div class="label">License Effective Date<span class="req">*</span> </div> 
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c }" id="EnvLicEffectiveDate" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(EPALicEffectiveDateError)!=0}">
+                                <div class="label">License Effective Date<span class="req">*</span> </div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c }" id="EnvLicEffectiveDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!EPALicEffectiveDateError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row">                            
+                            <apex:outputPanel rendered="{!LEN(EPALicExpirationDateError)==0}">
+                               <div class="label">License Expiration Date<span class="req">*</span> </div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Expiration_Date__c}" id="EnvLicExpirationDate" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(EPALicExpirationDateError)!=0}">
+                                <div class="label">License Expiration Date<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Expiration_Date__c}" id="EnvLicExpirationDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!EPALicExpirationDateError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row"> 
+                            <apex:outputPanel rendered="{!LEN(EPACertificationNumberError)==0}">
+                               <div class="label">EPA Certification Number<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.EPA_Certification_Number__c}" id="EnvLicEPACertificationNumber" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(EPACertificationNumberError)!=0}">
+                                <div class="label">EPA Certification Number<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.EPA_Certification_Number__c}" id="EnvLicEPACertificationNumber1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!EPACertificationNumberError}</div>
+                            </apex:outputPanel>
+                         </div>
+                        </apex:outputPanel>
+                     <!-- Environmental License ends here -->    
+                    <!--End: Story -->
+                     <!--- License doc meta data -->
+                     <apex:outputPanel rendered="{!DocType=='License'}">
+                        
+                         
+                        <div class="row">                        
+                            <div class="label"> License Name </div>
+                            <b><apex:outputText value="{!ProviderDoc.License_Name__c}" id="LicenseName" /></b>
+                        </div>
+                        <div class="row">
+                             <div class="label"> License State </div> 
+                            <b><apex:outputText value="{!ProviderDoc.Licensing_Authority_State__c}" id="LicensingAuthorityState" /></b>
+                        </div>
+                        <div class="row">
+                            <div class="label"> License Holder Type </div>
+                            <b><apex:outputText value="{!ProviderDoc.License_Holder_Type__c}" id="LicenseHolderType" /></b>
+                        </div>
+                        <div class="row">
+                            <apex:outputPanel rendered="{!LEN(LicEffectiveDateError)==0}">
+                               <div class="label">License Effective Date<span class="req">*</span> </div> 
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c }" id="LicEffectiveDate" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicEffectiveDateError)!=0}">
+                                <div class="label">License Effective Date<span class="req">*</span> </div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Effective_Date__c }" id="LicEffectiveDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicEffectiveDateError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row">                            
+                            <apex:outputPanel rendered="{!LEN(LicExpirationDateError)==0}">
+                               <div class="label">License Expiration Date<span class="req">*</span> </div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Expiration_Date__c}" id="LicExpirationDate" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicExpirationDateError)!=0}">
+                                <div class="label">License Expiration Date<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!myProviderDoc.Expiration_Date__c}" id="LicExpirationDate1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicExpirationDateError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row"> 
+                            <apex:outputPanel rendered="{!LEN(LicNumError)==0}">
+                               <div class="label">License Number<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!ProviderDoc.License_Number__c}" id="LicenseNumber" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicNumError)!=0}">
+                                <div class="label">License Number<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field" value="{!ProviderDoc.License_Number__c}" id="LicenseNumber1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicNumError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row">  
+                            <apex:outputPanel rendered="{!LEN(LicLevelError)==0}">
+                               <div class="label">License Level<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field slclc" value="{!ProviderDoc.License_Level1__c}" id="LicenseLevel" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicLevelError)!=0}">
+                                <div class="label">License Level<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field slclc" value="{!ProviderDoc.License_Level1__c}" id="LicenseLevel1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicLevelError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         <div class="row">
+                            <apex:outputPanel rendered="{!LEN(LicClassificationError)==0}">
+                               <div class="label">License Classification<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field slclc" value="{!ProviderDoc.Classification1__c}" id="LicenseClassification" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicClassificationError)!=0}">
+                                <div class="label">License Classification<span class="req">*</span></div>
+                               <apex:inputField styleClass="input-field slclc" value="{!ProviderDoc.Classification1__c}" id="LicenseClassification1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicClassificationError}</div>
+                            </apex:outputPanel>
+                         </div>
+                         
+                         <div class="row">  
+                            <div class="label"> License Issuing Authority  </div>
+                             <apex:inputText styleClass="input-field" value="{!ProviderDoc.Issuing_Authority__c}" id="LicenseIssAuth" />
+                        <!--    <apex:outputPanel rendered="{!LEN(LicIssuingAuthorityError)==0}">
+                               <div class="label"> <span class="req">*</span>License Issuing Authority  </div>
+                               <apex:inputText styleClass="input-field" value="{!ProviderDoc.Issuing_Authority__c}" id="LicenseIssAuth" />
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!LEN(LicIssuingAuthorityError)!=0}">
+                                <div class="label"> <span class="req">*</span>License Issuing Authority  </div>
+                               <apex:inputText styleClass="input-field" value="{!ProviderDoc.Issuing_Authority__c}" id="LicenseIssAuth1" />
+                               <div class="errorMsg error-msg"><strong></strong>&nbsp;{!LicIssuingAuthorityError}</div>
+                            </apex:outputPanel> -->
+                        </div>  
+                        
+                        <div class="row">    
+                            <div class="label"> License Company Name </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Company_Name__c}" id="LicenseCompanyName" />
+                        </div>
+                        <div class="row">                            
+                            <div class="label"> License Holder First Name </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_First_Name__c}" id="LicenseFirstHolderName" />
+                        </div>
+                        <div class="row">
+                            <div class="label"> License Holder Middle Name </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_Middle_Name__c}" id="LicenseMiddleHolderName" />
+                         </div>
+                        <div class="row">
+                            <div class="label"> License Holder Last Name </div>
+                            <apex:inputText styleClass="input-field"  value="{!ProviderDoc.License_Holder_Last_Name__c}" id="LicenseLastHolderName" />
+                        </div>
+                        <div class="row">
+                            <div class="label"> License Holder Address 1 </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_Address1__c}" id="LicenseHolderAddr1" />
+                         </div>
+                        <div class="row">
+                            <div class="label"> License Holder Address 2 </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_Address2__c}" id="LicenseHolderAddr2" />
+                         </div>
+                         <div class="row">
+                            <div class="label"> License Holder City </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_City__c}" id="LicenseHolderCity" />
+                         </div>
+                         <div class="row">
+                            <div class="label"> License Holder State </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_State__c}" id="LicenseHolderState" />
+                         </div>
+                         <div class="row">
+                            <div class="label"> License Holder ZIP Code </div>
+                            <apex:inputText styleClass="input-field" value="{!ProviderDoc.License_Holder_Zipcode__c}" id="LicenseHolderZIP" />
+                         </div>
+                         <div class="row">                            
+                           <div class="label"> Description (if any) </div>
+                           <apex:inputTextArea styleClass="input-field" value="{!ProviderDoc.Description__c}" id="Description1" rows="3"/>
+                        </div> 
+                    </apex:outputPanel>       
+                    <!--- Dispute License window -->                
+                    <apex:outputPanel id="dptreason" rendered="{!DocType=='Dispute License' && ProviderDoc.Document_Status__c != 'Under Review'}" >
+                        <div class="row">                       
+                            <div class="label"> License Name </div>
+                            <b><apex:outputText value="{!ProviderDoc.License_Name__c}" id="LicenseName1" /></b>
+                       </div>
+                       <div class="row">
+                            <apex:outputPanel rendered="{!LEN(LicDisputeReasonError)==0}" >
+                               <div class="label"> Dispute Reason <span class="req">*</span> </div>
+                             <!--  {!ProviderDoc.Document_Status__c}-->
+                               <apex:selectList value="{!selectedDisputeReason}" multiselect="false" size="1" styleClass="input-field dispute-select">
+                                  <apex:selectOption itemValue="" itemLabel="-None-"/>
+                                  <apex:selectOption itemValue="License not required" itemLabel="License not required"/>
+                                  <apex:selectOption itemValue="Will not install in designated area" itemLabel="Will not install in designated area"/>
+                                  <apex:selectOption itemValue="Will not perform scope of work" itemLabel="Will not perform scope of work"/>
+                               </apex:selectList>
+                            </apex:outputPanel>                            
+                            <apex:outputPanel rendered="{!LEN(LicDisputeReasonError)!=0}">
+                                <div class="label error-msg">Dispute Reason <span class="req">*</span></div>
+                                  <apex:selectList value="{!selectedDisputeReason}" multiselect="false" size="1" styleClass="input-field dispute-select">
+                                    <apex:selectOption itemValue="" itemLabel="-None-"/>
+                                    <apex:selectOption itemValue="License not required" itemLabel="License not required"/>
+                                    <apex:selectOption itemValue="Will not install in designated area" itemLabel="Will not install in designated area"/>
+                                    <apex:selectOption itemValue="Will not perform scope of work" itemLabel="Will not perform scope of work"/>
+                                  </apex:selectList>
+                                <div class="errorMsg error-msg" id="divDisputeErrr">{!LicDisputeReasonError}</div>
+                            </apex:outputPanel>
+                         </div>
+                    </apex:outputPanel>
+
+                    <div class="row">                        
+                         <!--- Document Upload and Button handling -->
+                         <apex:outputPanel rendered="{!LEN(InputDocError)==0 && DocType == 'Environmental License'}">
+                           <div class="label">Attachment </div>
+                           <apex:inputFile value="{!file}"  filename="{!inpfileName}" filesize="{!inpfilesize}" id="fileToUploadepa" />
+                         </apex:outputPanel>                         
+
+                         <apex:outputPanel rendered="{!LEN(InputDocError)==0 && DocType != 'Dispute License' && DocType != 'Environmental License'}">
+                           <div class="label">Attachment <span class="req">*</span>  </div>
+                           <apex:inputFile value="{!file}"  filename="{!inpfileName}" filesize="{!inpfilesize}" id="fileToUpload" />
+                         </apex:outputPanel>                         
+                        <apex:outputPanel rendered="{!LEN(InputDocError)!=0 && DocType != 'Dispute License' && DocType != 'Environmental License'}">
+                            <div class="label error-msg">Attachment<span class="req">*</span> </div>
+                                 <apex:inputFile value="{!file}" filename="{!inpfileName}" filesize="{!inpfilesize}" id="fileToUpload1" />
+                            <div class="errorMsg error-msg"><strong></strong>&nbsp;{!InputDocError}</div>
+                        </apex:outputPanel>
+                   </div>
+                   <div class="row">
+                        <apex:outputPanel rendered="{!ProviderDoc.Document_Status__c != 'Under Review' && DocType!='Dispute License'}">
+                            <p>* Indicates a required field.</p>
+                             <div style="width:50%">Please review your information before you save.<div style="height:1px">&nbsp;</div>Once you save this form you will no longer be able to edit.</div>                           
+                        </apex:outputPanel>
+                       <apex:outputPanel rendered="{!DocType =='Dispute License'}">
+                            <p style="font-size:16px;">* Indicates a required field.</p>
+                           <p style="font-size:16px;">Please review your information before you save.<br/>Once you save this form you will no longer be able to edit.</p>                           
+                        </apex:outputPanel>
+                    </div>
+                    <apex:outputpanel id="hiddenPanel">
+                        <apex:inputHidden id="isEnableToParent" value="{!isEnableToParent}"/>
+                    </apex:outputpanel>
+                    <!--Popup-->
+                    <apex:outputpanel rendered="{!IF(pp=='1'||pp=='2'||pp=='3',true,false)}">
+                        <div class="row btn-row" style="width:100% !important;">
+                            <div style="border-bottom:2px solid #ABABAB;"></div><br/>                       
+                            <apex:commandButton value="Cancel" styleclass="thd_Button Medium Secondary" style="margin-top:10px;float:left;" id="CancelButton3" onclick="parent.location.reload();" />
+                            <apex:commandButton value="Save" styleclass="thd_Button Medium Primary elem-right" style="float:right;" id="SaveButton3" action="{!upload}" rerender="hiddenPanel,dptreason" onComplete="onSaveClosePopup()" /> 
+                        </div>
+                    </apex:outputpanel>
+                    
+                    
+                    <!-- Not Pop up-->
+                    <apex:outputpanel rendered="{!IF(pp!='1',true,false)}">
+                        <div class="row btn-row">
+                             <!--  <apex:commandButton value="Back" styleclass="thd_Button Medium Secondary" id="BackButton" onclick="javascript:CloseWindow();"/> -->
+                            <apex:outputPanel rendered="{!DocType !='Dispute License'}" >
+                                 <div style="border-bottom:2px solid #ABABAB;"></div><br/>
+                             </apex:outputPanel>
+                             <!--<apex:outputPanel rendered="{!ProviderDoc.Document_Status__c != 'Under Review'}" id="Buttonspanel">   
+                                    <apex:commandButton value="Cancel" styleclass="thd_Button Medium Secondary" id="CancelButton" action="{!done}"  rendered="{!DocType == 'Dispute License'}" />-->
+                                <apex:commandButton value="Cancel" styleclass="thd_Button Medium Secondary" id="CancelButton1" action="{!cancel}" rendered="{!DocType != 'Dispute License'}" />
+                                <!-- <apex:commandButton value="Save" styleclass="thd_Button Medium Primary elem-right" id="SaveButton1" action="{!upload}" rendered="{!DocType == 'Dispute License'}"/> -->
+                                <apex:commandButton value="Save" styleclass="thd_Button Medium Primary elem-right" id="SaveButton2" action="{!upload}" rendered="{!DocType != 'Dispute License'}" /> 
+                                
+                             <!--</apex:outputPanel>
+                            <apex:commandButton value="Go back" styleclass="thd_Button Medium Secondary" id="GobackButton" action="{!done}" rendered="{!ProviderDoc.Document_Status__c == 'Under Review'}"  />-->
+                        </div>
+                    </apex:outputpanel>
+                    
+                    
+                </div>
+             </div>  
+                </apex:outputPanel>
+            </body>
+        </apex:form>
+    </html>
+</apex:page>

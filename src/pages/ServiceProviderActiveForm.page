@@ -1,0 +1,1082 @@
+<!-- 
+   @name: Service Provider Active Form
+   @author: Amritha
+   @date: 11-Jan-2017
+   @description: This is a landing page for Active Service Providers 
+   @ Modified by : Revathy Chithamalai
+   @ Modified Date : 20-Jan-2017
+   @ Modified Reason : To include functionlities  
+   @ Modified by : Revathy Chithamalai
+   @ Modified Date : 6-Feb-2017
+   @ Modified Reason : To include the warning message for 'Inactive compliance Hold';
+   @ Modified by : Revathy Chithamalai - TCS
+   @ Modified Date : 13-FEB-2017
+   @ Modified Reason : To update accordion functionality;
+   -->
+<apex:page showHeader="false" standardStylesheets="false" controller="DocumentUploadController">
+   <html>
+      <apex:form >
+         <head>
+            <title>Service Provider Onboarding</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+ <!--           <link href="{!URLFOR($Resource.SLDSR, '/assets/styles/salesforce-lightning-design-system.min.css')}" rel="stylesheet" /> -->
+            <!-- Global CSS styles applies-->
+            <apex:stylesheet value="{!URLFOR($Resource.serviceProviderForActiveForm)}"/>
+            <!-- START:Custom Style -->
+            <style>  
+                    iframe body{
+                    background-color:#ffffff !important;
+                }
+                        .custPopup{
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: fixed;          
+            width: 500px;
+            margin-left: -250px;
+            top:10%;
+        }
+        .popupBackground{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        .closeBtn{
+             margin-left: 35px !important;
+        }
+                div > label{
+                    font-weight:bold;
+                }
+               .col{
+                    width:30%;
+                    display:inline-block;
+                    float:left;
+                    margin-left:5px;
+                }
+                .col > div{
+                    padding:5px;
+                }
+                #accInfo .label, #accContacts .label{
+                    padding-top:20px;
+                }
+                .dtls-row{
+                     background-color: #f3f5f5;
+                     padding: 20px;
+                }
+                .row-equal{
+                    width:49%;
+                    float:left;
+                    margin-left:7px;
+                }
+                .btnspace{
+                    margin-right: 5px;
+                }
+                .row-equal .col{
+                    width:49%;
+                }
+                #accContacts{
+                    display:inline-block;
+                }
+                .buttonDisabled {
+                    background-color: #BBBAB9;
+                    border: none;
+                    color: white;                          
+                 }
+                 info-alert,.warn-alert,.succ-alert{                    
+                    Border-Radius: 2px;                
+                    Box-Shadow: 0px 0px 2px 0px rgba(0,0,0,0.12), 0px 2px 2px 0px rgba(0,0,0,0.24);
+                    Padding:16px;
+                    width:80%;
+                        Font-Family: Open Sans; 
+                        margin-bottom:20px;
+                        
+                }
+                .info-alert{ 
+                    Background-Color: #E9F1FA;
+                    border: 1px solid #286FAD
+                }
+                .warn-alert{ 
+                    Background-Color: #FFC20E;
+                }
+                .succ-alert{ 
+                    Background-Color: #00AE4D;
+                }
+                .info-alert-message p,.warn-alert-message p,.succ-alert-message p{  
+                        Font-Weight: 400 (Open Sans Normal 400); 
+                    Font-Size: 14px;
+                        width:90%;
+                        margin-left:24px;                  
+                }
+                .info-alert-message p{  
+                        Color:#286FAD;
+                }
+                .warn-alert-message p{  
+                        Color:#444444; 
+                }
+                .succ-alert-message p{  
+                        Color:#FFFFFF; 
+                }
+                label{
+                    word-wrap: break-word;
+                    -ms-word-wrap: break-word;
+                    word-break: break-all;
+                    -ms-word-break: break-all;                
+                }
+                .accordion-container .col1{
+                     width: 23.5% !important;
+                }
+                 .accordion-container .col5{
+                     width: 25% !important;
+                }
+               .mobileView{
+                  display:none;
+                }
+                @media (max-width: 720px) { 
+                
+                  .col{
+                     width:100%;
+                     display:block;
+                  }
+                  .row-equal{
+                     width:100%;
+                     float:left;
+                 }
+                  .row-equal .col{
+                        width:100%;
+                 }
+                   .mobileView{
+                       display:inline;
+                   }
+                   .col1,.col2,.col3,.col4,.col5,.col6,.accordion-container .col1,.accordion-container .col5{
+                        width: 96% !important;
+                        display:block !important;
+                        word-wrap: normal !important;
+                        word-break: normal !important;
+                        height: auto !important;
+                        text-align:left !important;
+                        font-weight:normal !important;
+                    }
+                    .table-header{
+                        display:none;
+                    }                  
+                 }
+                
+                    /* The Modal (background) */
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    /* Modal Content */
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%;
+    }
+    
+    input[type='checkbox']{
+         transform: scale(1.5); 
+         -moz-transform: scale(1.5); 
+         -ms-transform: scale(1.5); 
+         -webkit-transform: scale(1.5); 
+         -o-transform: scale(1.5); 
+    }
+    input[type='checkbox'] +label{
+         line-height: 25px;
+    }
+    input[type='checkbox']:checked{ 
+         display:none;
+    }
+    
+    .label{
+         padding-bottom:30px;                  
+    } 
+              
+    input[type='checkbox']:checked +label{ 
+         background: url({!URLFOR($Resource.CheckBoxSelect)}) no-repeat left;
+         padding-left: 25px;
+         background-size: 19px 22px;
+     }
+
+    /* The Close Button */
+    
+    .close {
+        color: #F58220;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+                
+            </style>
+            <!-- ENDS: Custom Style --->
+            <apex:includeScript value="{!$Resource.jquery_1_9_1}"/>
+            <script type="text/javascript">
+               var j$ = jQuery.noConflict();   
+            // Accordion Open/close function               
+             j$(document).ready(function(){
+             j$(".ac-content-container").hide();
+                 j$(".acc-header input[type=checkbox]").click(function (e) {
+                     var elemId = j$(this).attr("accindex"); 
+                     var containerId = "ac-content-container-"+elemId;
+                     var headerId="acc-header-"+elemId;
+                     var checkboxId = "ac-"+elemId;
+                    
+                    if (j$("#"+containerId).is(':visible')) {
+                        j$("#"+containerId).hide();
+                        j$("#"+headerId+" i").removeClass("down");
+                        j$("#"+headerId+" i").addClass("right");                        
+                        j$("#"+checkboxId).removeAttr("checked");
+                    }else{
+                        j$("#"+containerId).show();
+                        j$("#"+headerId+" i").addClass("down");
+                        j$("#"+headerId+" i").removeClass("right");
+                        j$("#"+checkboxId).attr("checked","checked");
+                    }
+                });
+               j$(".acc-header").click(function (e) {
+                     var elemId = j$(this).attr("accindex"); 
+                     var containerId = "ac-content-container-"+elemId;
+                     var headerId="acc-header-"+elemId;
+                     var checkboxId = "ac-"+elemId;
+                                         
+                    if (j$("#"+containerId).is(':visible')) {
+                        j$("#"+containerId).hide();
+                        j$("#"+headerId+" i").removeClass("down");
+                        j$("#"+headerId+" i").addClass("right");                        
+                        j$("#"+checkboxId).removeAttr("checked");
+                    }else{
+                        j$("#"+containerId).show();
+                        j$("#"+headerId+" i").addClass("down");
+                        j$("#"+headerId+" i").removeClass("right");
+                        j$("#"+checkboxId).attr("checked","checked");
+                    }
+                });
+              /*j$(".ac-content-container").click(function (e) {
+                     var elemId = j$(this).attr("accindex"); 
+                     var containerId = "ac-content-container-"+elemId;
+                     var headerId="acc-header-"+elemId;
+                     var checkboxId = "ac-"+elemId;
+                    if (j$("#"+containerId).is(':visible')) {
+                        j$("#"+containerId).hide();
+                        j$("#"+headerId+" i").removeClass("down");
+                        j$("#"+headerId+" i").addClass("right");
+                        j$("#"+checkboxId).removeAttr("checked");
+                    }else{                       
+                        j$("#"+containerId).show();
+                        j$("#"+headerId+" i").addClass("down");
+                        j$("#"+headerId+" i").removeClass("right");
+                        j$("#"+checkboxId).attr("checked","checked");
+                    }
+                });*/
+              
+           });
+               
+                    function openAttach(id,doctype){
+                        if(id != '' && id != null) 
+                            AttachWindow = window.open('../ServiceProviderDocumentsUpload?pDocId='+id+'&DocType='+doctype+'&SrcPage=ServiceProviderActiveForm', '_blank','height=500,width=400,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+  
+                        newWin.focus(); 
+                        return false; 
+                    }
+                  function closePopup() 
+                   { 
+                        if (null!=newWin) 
+                        {  
+                        newWin.close(); 
+                        } 
+                   }
+                   
+                    function getpartnerAttachDocData(parentDocId){
+                                
+                                j$("#errorModalBox").hide();
+                                
+                                    DocumentUploadController.getPartnerAttach( parentDocId, 
+                                                                    function(result, event) {
+                                                                        if( result != null ){
+                                                                            var hrefid = '#hyper-'+parentDocId;
+                                                                            //window.open("https://c.cs59.content.force.com/servlet/servlet.FileDownload?file="+result);
+                                                                            //**window.open("https://c.cs59.content.force.com/sfc/servlet.shepherd/version/download/"+result);
+                                                                            
+                                                                             window.open("{!$Label.DocComPartnerCommunityURL}/sfc/servlet.shepherd/version/download/"+result);
+                                                                            //window.open("{!$Label.DocComPartnerCommunityURL}/sfc/servlet.shepherd/version/download/"+result);
+                                                                        } else {
+                                                                            document.getElementById("errormessage").innerHTML = 'Something went wrong, Try after page refresh. if still issue occurs please connect with your SPRC.';
+                                                                            $("#errorModalBox").show();
+                                                                            return true;
+                                                                        }
+                                                                    }, 
+                                                                    {escape:true});
+                                }
+                
+            </script>
+         </head>
+         <body>
+            <div class="container">
+                <apex:outputPanel id="popup">
+                 <apex:outputPanel rendered="{!displayPopup}">
+                 </apex:outputPanel> 
+                </apex:outputPanel>
+
+                <div class="header-content" id="header-content">
+                   <div id="logo" class="logo">
+                      <apex:image value="{!$Resource.Home_Depot_Logo}" width="200px" height="90px;" id="headerImage" />
+                   </div>
+                </div>
+                <div id="mainFormDiv">
+                    <!--STARTS: Inactive Compliance Hold - Warning Message  ---->
+                    <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                    <div class="warn-alert" style="box-shadow:0px 0px 2px 0px rgba(0,0,0,0.12)">
+                        <table style="width:100%">
+                            <tr>
+                                <td style="vertical-align:top;padding:0px 10px 0px 0px"><apex:image value="{!$Resource.WarningIcon}"  height="30" width="30"/></td>
+                                <td style="vertical-align:top"><div class="warn-alert-title" style="Font-Weight: 600;height:0px">Inactive Compliant Hold</div></td>
+                                <td style="vertical-align:top"><apex:image value="{!$Resource.CloseIconBlack}"  height="13" width="13" styleClass="elem-right"/></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <div class="warn-alert-message" style="font-Size: 14px;font-family: “Open Sans”,OpenSans,Arial,sans-serif;">
+                                        Your account is currently inactive. Please contact your assigned SPRC for additional details.
+                                    </div>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                        <!--
+                        <div class="warn-alert-title"><apex:image value="{!$Resource.WarningIcon}"  height="20" width="20"/>
+                            <p>Onboarding on hold</p></div>
+                        <div class="alert-close"><apex:image value="{!$Resource.CloseIconBlack}"  height="15" width="15" styleClass="elem-right"/></div>
+                        <div class="warn-alert-message">
+                            Your progress through our on boarding process has been paused. Please contact your assigned SPRC for additional details.
+                        </div>-->
+                    </div>
+                    </apex:outputPanel>
+                  <!--   ENDS:Warning Message  ---->                 
+                   <h1>Welcome to the Service Provider Portal</h1>
+                   <div class="sub-section">                
+                      <p>Below you'll ﬁnd contact information for your assigned SPRC,  a brief overview of your account information,
+                          and the contact information for your business's account managers. You can see additional account information and contacts, 
+                          if any, by selecting "Account" or "Contacts" in the navigation bar above.</p>
+                      <p>You can review any of your currently accepted documents (business, insurance, licenses), if any of your licenses or insurance documents are coming up for renewal, then we'll list them at the bottom of this page as well</p>
+                   </div>
+
+                  <!-- STARTS: SPRC Details --->
+                  <div class="sub-section">
+                      <h2>SPRC Details</h2>
+                      <div class="row dtls-row">
+                          <div class="col">
+                             <div class="label">Assigned SPRC</div>
+                             <div><label> {!AssignedSPRC}</label></div>                     
+                         </div>
+                          <div class="col">
+                             <div class="label">Assigned SPRC Email </div>
+                             <div><label> {!accntDetails.Assigned_SPRC__r.Email}</label></div>                     
+                         </div>
+                          <div class="col">
+                             <div class="label">Assigned SPRC Phone </div>
+                             <div><label>{!accntDetails.Assigned_SPRC__r.Phone}</label></div>                     
+                           </div>
+                      </div>                    
+                   </div>
+                    <!-- ENDS: SPRC Details --->
+                    <!-- STARTS: Account Information --->
+                    <div class="sub-section" id="accInfo">
+                        <h2>Account Information</h2>
+                        <div class="row dtls-row">
+                            <div class="col">
+                                <div class="label">Doing Business As</div>
+                                <div><label>{!accntDetails.Doing_Business_As_DBA__c}</label></div>
+                                <div class="label">Account Name</div>
+                                <div><label>{!accntDetails.Name}</label></div>
+                                <div class="label">Website</div>
+                                <div><label>{!accntDetails.Website}</label></div> 
+                             </div>
+                              <div class="col">
+                                 <div class="label">Account Status </div>
+                                 <div><label>{!accntDetails.Status__c}</label></div> 
+                                  <div class="label">Pvendor </div>
+                                  <div><label>{!accntDetails.AccountNumber}</label></div>
+                                  <div class="label">Lines of Business</div>
+                                  <div><label>{!accntDetails.Line_of_Business__c}</label></div>   
+                             </div>
+                              <div class="col">
+                                 <div class="label">Phone </div>
+                                 <div><label>{!accntDetails.Phone}    </label></div> 
+                                  <div class="label">Billing Address</div>
+                                <div>
+                                    <label>{!accntDetails.BillingStreet}</label><br/>
+                                    <label>{!accntDetails.BillingCity}, {!accntDetails.BillingState} </label><br/>
+                                    <label>{!accntDetails.BillingCountry}</label><br/>
+                                    <label>{!accntDetails.BillingPostalCode}</label>
+                                </div> 
+                             </div>
+                          </div> 
+                    </div> 
+                    <!-- ENDS: Account Information --->
+                    <!-- STARTS:Account Contacts --->
+                  <div class="sub-section" id="accContacts">
+                      <h2>Account Contacts</h2>
+                      <div class="row dtls-row row-equal">
+                          <div class="col">
+                             <div class="label">Primary Contact</div>
+                             <div><label>{!primaryContact.Name}</label></div>  
+                             <div class="label">Email</div>
+                             <div><label>{!primaryContact.Email}</label></div> 
+                              <div class="label">Phone</div>
+                             <div><label> {!primaryContact.Phone} </label></div> 
+                              <div class="label">Mobile</div>
+                             <div><label>{!primaryContact.MobilePhone}</label></div> 
+                         </div>
+                       </div> 
+                       
+                      <apex:outputPanel rendered="{!complianceContact!=null}" >
+                      <div class="row dtls-row row-equal">
+                          <div class="col">
+                             <div class="label">Compliance Contact</div>
+                             <div><label>{!complianceContact.Name} </label></div>  
+                              <div class="label">Email</div>
+                             <div><label>{!complianceContact.Email} </label></div> 
+                              <div class="label">Phone</div>
+                             <div><label> {!complianceContact.Phone} </label></div> 
+                              <div class="label">Mobile</div>
+                             <div><label>{!complianceContact.MobilePhone}</label></div> 
+                         </div>
+                                                   
+                      </div> 
+                     </apex:outputPanel>
+                   </div>
+                    <!-- ENDS: Account Contacts --->
+                     
+          <!-- STARTS: Documents Needing Attention --->
+              <apex:outputPanel rendered="{!listLicenseNeedAttentionDocuments.size >0  || listNAInsuranceDocuments.size > 0 || listCurrentEnvironmentalLicenseDocuments.size > 0 || listNABDandSPADocuments.size > 0}" >
+                <div id="DocNeedAttention" class="sub-section">
+                    <h2>Documents Needing Attention</h2>
+                </div>
+                <apex:outputPanel rendered="{!listNAInsuranceDocuments.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Insurance</h3>
+                </div>
+                <!-- Insurance docs starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">Name</div>
+                            <div class="col2 col-header">Policy #</div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listNAInsuranceDocuments}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                <div class="col2"><label class="mobileView"><b>Policy #: </b></label> {!pDocs.Policy_Number__c}</div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!pDocs.Expiration_Date__c}" />
+                                    </apex:outputText>
+                                </div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                  <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary " action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                            <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium Secondary" reRender="popup" />
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- STARTS: Buttons when Account status inactive -->
+                                  <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled " disabled="true" >
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled " disabled="true"/>
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- ENDS: Buttons when Account status inactive -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!-- ENDS:Insurance Documents Needs Attention --->
+                <!-- Start: Story -->
+                <!-- START:Environmental Licenses Needs Attention --->
+                <apex:outputPanel rendered="{!listNAEnvironmentalLicenseDocuments.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Environmental Licenses</h3>
+                </div>
+                <!-- Insurance docs starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">License Name</div>
+                            <div class="col2 col-header">EPA Certification #</div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listNAEnvironmentalLicenseDocuments}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.License_Name__c}</div>
+                                <div class="col2"><label class="mobileView"><b>EPA Certification #: </b></label> {!pDocs.EPA_Certification_Number__c}</div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> {!pDocs.Formatted_Expiration_Date__c}</div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                  <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                      <apex:outputPanel rendered="{!IF(AND(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Submitted',pDocs.Document_Status__c == 'Needs Revision'), OR(pDocs.Document_Status__c == 'Needs Revision', pDocs.Has_Attachment__c == false) ), true, false)}">
+                                        <apex:commandButton value="Update " styleClass="thd_Button Medium Primary " action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                            <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required', pDocs.Has_Attachment__c == true), true, false)}">
+                                           <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium  Secondary btnspace" reRender="popup" />
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- STARTS: Buttons when Account status inactive -->
+                                  <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Update " styleClass="thd_Button Medium buttonDisabled " disabled="true" >
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                              <!--      <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled " disabled="true"/>
+                                    </apex:outputPanel> -->
+                                  </apex:outputPanel> 
+                                  <!-- ENDS: Buttons when Account status inactive -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!-- ENDS:Environmental Licenses Needs Attention --->
+                <!-- End: Stroy -->
+                <!-- STARTS: License Documents Needs attention--->
+               <apex:outputPanel rendered="{!listLicenseNeedAttentionDocuments.size > 0}" >
+                <div id="licensescSec" class="sub-section">
+                     <h3>Licenses</h3>
+                </div>
+                <div class="accordion-container">
+                    <apex:variable var="accIndex" value="{!0}" />
+                    <apex:repeat var="key" value="{!mapStateLicenseNeedsAttendocuments}">
+                    <div class="acc-section">
+                        <div id="acc-header-{!accIndex}" class="acc-header" accindex="{!accIndex}">
+                            <input id="ac-{!accIndex}" type="checkbox" name="accordion-1"  accindex="{!accIndex}" />
+                            <label for="ac-{!accIndex}">
+                                <i class="arrow right"></i>
+                                <span>{!key}</span>
+                            </label>
+                        </div>
+
+                         <div id="ac-content-container-{!accIndex}" class="ac-content-container" accindex="{!accIndex}" style="padding:0px;">
+                             <div style="background-color:#f1f1f1; padding: 10px;">
+                             <div id="ac-content-table-{!accIndex}" class="ac-content table">
+                             <div class="tableDiv">
+                                    <div class="tableRow firstRow table-header">
+                                        <div class="col1 col-header">Name</div>
+                                        <div class="col2 col-header">License #</div>
+                                        <div class="col3 col-header">Status</div>
+                                        <div class="col4 col-header">Expiration Date</div>
+                                        <div class="col5 col-header">Comment</div>
+                                        <div class="col6 col-header">Action</div>
+                                    </div>                                      
+                                    <apex:repeat var="pDocs" value="{!mapStateLicenseNeedsAttendocuments[key]}">
+                                    <div class="tableRow">                                      
+                                        <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                        <div class="col2"><label class="mobileView"><b>Licence #: </b></label> {!pDocs.License_Number__c}</div>
+                                        <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                        <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> {!pDocs.Formatted_Expiration_Date__c}</div>
+                                        <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                        <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                         <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                            <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                                <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary btnspace" action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                                    <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                                </apex:commandButton>
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                                <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium  Secondary btnspace" reRender="popup" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                              <apex:commandButton value="Dispute" styleClass="thd_Button Medium Secondary " action="{!showPopup}"  reRender="tstpopup" >
+                                                 <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!docIdDispute}"/>
+                                              </apex:commandButton> 
+                                            </apex:outputPanel>
+                                         </apex:outputPanel>
+                                         <!-- STARTS - When the account status is inactive compliance hold -->
+                                         <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                            <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                                <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled btnspace" disabled="true" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                                <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled btnspace" disabled="true" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                              <apex:commandButton value="Dispute" styleClass="thd_Button Medium buttonDisabled" disabled="true" />
+                                            </apex:outputPanel>
+                                         </apex:outputPanel>
+                                         <!-- ENDS - BUTTONS - When the account status is inactive compliance hold -->
+                                        </div>
+                                     </div>
+                                  <!-- </apex:pageBlockTable>
+                                  </apex:pageBlock>  -->
+                                  </apex:repeat>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                        <apex:variable var="accIndex" value="{!(accIndex+1)}" />
+                    </apex:repeat>                 
+                </div>
+                </apex:outputPanel>
+                <!-- ENDS:License--->
+               <apex:outputPanel rendered="{!listNABDandSPADocuments.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Business Document</h3>
+                </div>
+                <!-- Insurance docs starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">Name</div>
+                            <div class="col2 col-header"></div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listNABDandSPADocuments}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                <div class="col2"><label class="mobileView"><b>Status: </b></label></div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!pDocs.Expiration_Date__c}" />
+                                    </apex:outputText>
+                                </div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                  <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary " action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                            <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Type__c == 'SPA', $User.FirstName + ' ' +$User.LastName == primaryContact.Name),true,false)}">
+                                        <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium Secondary" reRender="popup" />
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- STARTS: Buttons when Account status inactive -->
+                                  <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled " disabled="true" >
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled " disabled="true"/>
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- ENDS: Buttons when Account status inactive -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!--End Document Needed-->
+                <!-- ENDS: Documents Needing attention--->
+            </apex:outputPanel>    
+                
+                
+                
+                
+                
+                
+                    
+              <!--Start - Display Current Documents  -->
+              <apex:outputPanel rendered="{!listNABDandSPADocuments_CurrDoc.size > 0 || listNAInsuranceDocuments_CurrDoc.size > 0 || listCurrentEnvironmentalLicenseDocuments.size > 0 || listLicenseCurrentDocuments.size > 0}" >
+                <div id="DocNeedAttention" class="sub-section">
+                    <h2>Current Active Documents</h2>
+                </div>
+                <apex:outputPanel rendered="{!listNAInsuranceDocuments_CurrDoc.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Insurance</h3>
+                </div>
+                <!-- Insurance docs starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">Name</div>
+                            <div class="col2 col-header">Policy #</div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listNAInsuranceDocuments_CurrDoc}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                <div class="col2"><label class="mobileView"><b>Policy #: </b></label> {!pDocs.Policy_Number__c}</div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!pDocs.Expiration_Date__c}" />
+                                    </apex:outputText>
+                                </div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                  <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary " action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                            <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium Secondary" reRender="popup" />
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- STARTS: Buttons when Account status inactive -->
+                                  <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled " disabled="true" >
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled " disabled="true"/>
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- ENDS: Buttons when Account status inactive -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!-- ENDS: Display Current Insurance Documents  --->
+                
+               <!--Start: Story -->
+                <!-- STARTS: Display Current Environmental Licenses  ---> 
+                <apex:outputPanel rendered="{!listCurrentEnvironmentalLicenseDocuments.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Environmental Licenses</h3>
+                </div>
+                <!-- Environmental Licenses starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">Name</div>
+                            <div class="col2 col-header">EPA Certification #</div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listCurrentEnvironmentalLicenseDocuments}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                <div class="col2"><label class="mobileView"><b>EPA Certification #: </b></label> {!pDocs.EPA_Certification_Number__c}</div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> {!pDocs.Formatted_Expiration_Date__c}</div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                    <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                        <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                            <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary btnspace" action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                                <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                            </apex:commandButton>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!IF(AND(OR(pDocs.Document_Status__c == 'Approved', pDocs.Document_Status__c == 'Valid'), pDocs.Has_Attachment__c == true), true, false)}">
+                                            <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium  Secondary btnspace" reRender="popup" />
+                                        </apex:outputPanel>
+
+                                        <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'Environmental License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                            <apex:commandButton value="Dispute" styleClass="thd_Button Medium Secondary " action="{!showPopup}"  reRender="tstpopup" >
+                                                <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!docIdDispute}"/>
+                                            </apex:commandButton> 
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <!-- STARTS - When the account status is inactive compliance hold -->
+                                    <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                        <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                            <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled btnspace" disabled="true" />
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'Environmental License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                            <apex:commandButton value="Dispute" styleClass="thd_Button Medium buttonDisabled" disabled="true" />
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <!-- ENDS - BUTTONS - When the account status is inactive compliance hold -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!-- ENDS: Display Current Environmental Documents  --->
+               <!-- End: Story -->
+                  
+                                  
+                <!-- STARTS: License Documents Needs attention--->
+              <!-- <apex:outputPanel rendered="{!listLicenseCurrentDocuments.size > 0}" > -->
+                <apex:outputPanel rendered="{!listLicenseCurrentDocuments.size > 0}" >
+                <div id="licensescSec" class="sub-section">
+                     <h3>Licenses</h3>
+                </div>
+                <div class="accordion-container">
+                    <apex:variable var="accIndex" value="{!999999}" />
+                    <apex:repeat var="key" value="{!mapStateLicenseNeedsAttendocuments_CurrDoc}">
+                    <div class="acc-section">
+                        <div id="acc-header-{!accIndex}" class="acc-header" accindex="{!accIndex}">
+                            <input id="ac-{!accIndex}" type="checkbox" name="accordion-1"  accindex="{!accIndex}" />
+                            <label for="ac-{!accIndex}">
+                                <i class="arrow right"></i>
+                                <span>{!key}</span>
+                            </label>
+                        </div>
+
+                         <div id="ac-content-container-{!accIndex}" class="ac-content-container" accindex="{!accIndex}" style="padding:0px;">
+                             <div style="background-color:#f1f1f1; padding: 10px;">
+                             <div id="ac-content-table-{!accIndex}" class="ac-content table">
+                             <div class="tableDiv">
+                                    <div class="tableRow firstRow table-header">
+                                        <div class="col1 col-header">Name</div>
+                                        <div class="col2 col-header">License #</div>
+                                        <div class="col3 col-header">Status</div>
+                                        <div class="col4 col-header">Expiration Date</div>
+                                        <div class="col5 col-header">Comment</div>
+                                        <div class="col6 col-header">Action</div>
+                                    </div>                                      
+                                    <apex:repeat var="pDocs" value="{!mapStateLicenseNeedsAttendocuments_CurrDoc[key]}">
+                                    <div class="tableRow">                                      
+                                        <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                        <div class="col2"><label class="mobileView"><b>License #: </b></label> {!pDocs.License_Number__c}</div>
+                                        <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                        <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> {!pDocs.Formatted_Expiration_Date__c}</div>
+                                        <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                        <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                         <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                            <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                                <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary btnspace" action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                                    <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                                </apex:commandButton>
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                                <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium  Secondary btnspace" reRender="popup" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                              <apex:commandButton value="Dispute" styleClass="thd_Button Medium Secondary " action="{!showPopup}"  reRender="tstpopup" >
+                                                 <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!docIdDispute}"/>
+                                              </apex:commandButton> 
+                                            </apex:outputPanel>
+                                         </apex:outputPanel>
+                                         <!-- STARTS - When the account status is inactive compliance hold -->
+                                         <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                            <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                                <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled btnspace" disabled="true" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                                <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled btnspace" disabled="true" />
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!IF(AND(pDocs.RecordType.Name == 'License',OR(pDocs.Document_Status__c == 'Requested',pDocs.Document_Status__c == 'Needs Revision')), true, false)}">
+                                              <apex:commandButton value="Dispute" styleClass="thd_Button Medium buttonDisabled" disabled="true" />
+                                            </apex:outputPanel>
+                                         </apex:outputPanel>
+                                         <!-- ENDS - BUTTONS - When the account status is inactive compliance hold -->
+                                        </div>
+                                     </div>
+                                  <!-- </apex:pageBlockTable>
+                                  </apex:pageBlock>  -->
+                                  </apex:repeat>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                        <apex:variable var="accIndex" value="{!(accIndex+1)}" />
+                    </apex:repeat>                 
+                </div>
+                </apex:outputPanel>
+                <!-- ENDS:License--->
+                              
+                  
+               <!--Current Documents-->
+              <apex:outputPanel rendered="{!listNABDandSPADocuments_CurrDoc.size > 0}" >
+                <div id="insuranceDocSec" class="sub-section">
+                    <h3>Business Document</h3>
+                </div>
+                <!-- Insurance docs starts here -->
+                <div id="insuranceDocTable" class="table">
+                    <div class="tableDiv">
+                        <div class="tableRow firstRow table-header">
+                            <div class="col1 col-header">Name</div>
+                            <div class="col2 col-header"></div>
+                            <div class="col3 col-header">Status</div>
+                            <div class="col4 col-header">Expiration Date</div>
+                            <div class="col5 col-header">Comment</div>
+                            <div class="col6 col-header">Action</div>
+                        </div>
+                        <apex:repeat var="pDocs" value="{!listNABDandSPADocuments_CurrDoc}">
+                            <div class="tableRow">
+                                <div class="col1"><label class="mobileView"><b>Name: </b></label> {!pDocs.Document_Type__c}</div>
+                                <div class="col2"><label class="mobileView"><b>Name: </b></label></div>
+                                <div class="col3"><label class="mobileView"><b>Status: </b></label> {!pDocs.Document_Status__c}</div>
+                                <div class="col4"><label class="mobileView"><b>Expiration Date: </b></label> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!pDocs.Expiration_Date__c}" />
+                                    </apex:outputText>
+                                </div>
+                                <div class="col5"><label class="mobileView"><b>Comment: </b></label> {!pDocs.Comments__c}</div>
+                                <div class="col6"><label class="mobileView"><b>Action: </b></label> 
+                                  <apex:outputPanel rendered="{!!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium Primary " action="/apex/ServiceProviderDocumentsUpload?pDocId={!pDocs.Id}&DocType={!pDocs.RecordType.Name}&SrcPage=ServiceProviderActiveForm" reRender="popup">
+                                            <apex:param name="docIdParam" value="{!pDocs.Id}" assignTo="{!documentIdSelected}"/>
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Type__c == 'SPA', $User.FirstName + ' ' +$User.LastName == primaryContact.Name),true,false)}">
+                                        <apex:commandButton value="  View   "  onclick="getpartnerAttachDocData('{!pDocs.Id}');" styleClass="thd_Button Medium Secondary" reRender="popup" />
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- STARTS: Buttons when Account status inactive -->
+                                  <apex:outputPanel rendered="{!isInactiveComplianceHold}" >
+                                    <apex:outputPanel rendered="{!IF(OR(pDocs.Document_Status__c == 'Requested', pDocs.Document_Status__c == 'Needs Revision'), true, false)}">
+                                        <apex:commandButton value="Upload " styleClass="thd_Button Medium buttonDisabled " disabled="true" >
+                                        </apex:commandButton>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!IF(AND(pDocs.Document_Status__c != 'Requested', pDocs.Document_Status__c != 'Under Review', pDocs.Document_Status__c != 'Not Required'), true, false)}">
+                                        <apex:commandButton value="  View   "  styleClass="thd_Button Medium buttonDisabled " disabled="true"/>
+                                    </apex:outputPanel>
+                                  </apex:outputPanel>
+                                  <!-- ENDS: Buttons when Account status inactive -->
+                                </div>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                </div>
+               </apex:outputPanel>
+                <!--End Document Needed-->
+                <!-- ENDS: Active Documents --->
+
+  
+                </apex:outputPanel>
+                </div>       
+                <apex:outputPanel id="tstpopup">
+                   <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayPopUp}"/>
+                      <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!displayPopUp}">
+                        <!--<apex:include pageName="ServiceProviderDocumentsUpload"/>-->
+                           <apex:iframe src="..{!$Label.PartnerApex}/ServiceProviderDocumentsUpload?pDocId={!docIdDispute}&DocType=Dispute License&pp=3&SrcPage=ServiceProviderActiveForm" height="500"/>
+                           <!-- <div class="row btn-row">
+                              <apex:commandButton value="Cancel" styleClass="thd_Button Medium Secondary closeBtn" action="{!closePopup}" rerender="tstpopup"/> 
+                           </div>-->
+                           
+                      </apex:outputPanel>
+                   </apex:outputPanel>  
+                   <br/><br/><br/><br/><br/>
+             </div>
+             <div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+   
+      <h1 style="text-align: center;"><b style="color:#F96302; Font-Size: 20px;">Supplier AlertLine</b></h1>
+ <p>
+If you are aware of a situation where you think there may be a violation of Company policy pertaining to receiving or soliciting gifts, bribes or kickbacks, disclosure of conﬁdential information or a conﬂict of interest, contact the Supplier AlertLine at:
+</p>
+<p>
+• United States and Canada: 1-800-435-3152 <br/>
+• Mexico: 001-888-765-8153 <br/>
+• China: 10-800-711-0714 or 10-800-110-0654
+<br/>
+<a href="javascript: w=window.open('{!URLFOR($Resource.Supplier_Alertline)}');">Please click here for additional information</a>
+</p>
+
+       <div class="label">
+            <input type="checkbox"  id="Inputcheckbox" value="{!isSALmsgAcknowledged}"/>
+            <label for="Inputcheckbox">Do not show this warning again</label>
+            <button type="button" id="myBtn" class="thd_Button Medium Primary "  onclick="closeModal()" style="float:right">OK</button>   
+      </div>
+</div>
+</div> 
+             
+><apex:actionFunction name="upDateSALmsgAcknowledgement" action="{!upDateSALmsgAcknowledgement}" rerender="pb">
+    <apex:param name="x" value="" assignTo="{!isSALmsgAcknowledged}" />
+</apex:actionFunction>
+
+          </body>
+      </apex:form>
+<script>
+// Get the modal
+var isSPAcknowledgedSAL ="{!isSALmsgAcknowledged}";
+var modal;
+console.log(isSPAcknowledgedSAL);
+
+switch (isSPAcknowledgedSAL) {
+    case "false":
+        modal = document.getElementById('myModal');
+        break;
+    case "true":
+        break;
+}
+var btn = document.getElementById("Inputcheckbox");
+       console.log(btn.checked);
+var span = document.getElementsByClassName("close")[0];
+span.onclick = function() {
+modal.style.display = "none";
+}
+window.onload = function (){
+        modal.style.display = "block";
+}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+function closeModal() {
+    var btn = document.getElementById("Inputcheckbox").checked;
+    upDateSALmsgAcknowledgement(btn);
+    modal.style.display = "none";        
+    console.log(btn);
+    //           var isSPAcknowledgedSAL ="{!isSALmsgAcknowledged}";
+}  
+</script>   
+    </html>
+</apex:page>
